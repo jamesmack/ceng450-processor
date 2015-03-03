@@ -185,31 +185,33 @@ process (clock)
 			EXMEM_ra_addr <= "00";
 			EXMEM_ra <= "00000000";
 		else
-			EXMEM_opcode <= IDEX_opcode;
-			EXMEM_ra_addr <= IDEX_ra_addr;
-			EXMEM_ra <= IDEX_ra;
-		
-			case IDEX_opcode(3 downto 0) is
-				when "0000" =>	-- NOP
-					NULL;
-				when "0100" => -- ADD
-					EXMEM_ra <= std_logic_vector(alu_result);
-				when "0101" => -- SUB
-					EXMEM_ra <= std_logic_vector(alu_result);
-				when "0110" => -- SHL
-					EXMEM_ra <= std_logic_vector(alu_result);
-				when "0111" => -- SHR
-					EXMEM_ra <= std_logic_vector(alu_result);
-				when "1000" => -- NAND
-					EXMEM_ra <= std_logic_vector(alu_result);
-				when "1011" => -- IN
-					NULL;
-				when "1100" => -- OUT
-					NULL;
-				when "1101" => -- MOV
-					EXMEM_ra <= IDEX_rb;
-				when others => NULL;
-			end case;
+			if (rising_edge(clock)) then
+				EXMEM_opcode <= IDEX_opcode;
+				EXMEM_ra_addr <= IDEX_ra_addr;
+				EXMEM_ra <= IDEX_ra;
+			
+				case IDEX_opcode(3 downto 0) is
+					when "0000" =>	-- NOP
+						NULL;
+					when "0100" => -- ADD
+						EXMEM_ra <= std_logic_vector(alu_result);
+					when "0101" => -- SUB
+						EXMEM_ra <= std_logic_vector(alu_result);
+					when "0110" => -- SHL
+						EXMEM_ra <= std_logic_vector(alu_result);
+					when "0111" => -- SHR
+						EXMEM_ra <= std_logic_vector(alu_result);
+					when "1000" => -- NAND
+						EXMEM_ra <= std_logic_vector(alu_result);
+					when "1011" => -- IN
+						NULL;
+					when "1100" => -- OUT
+						NULL;
+					when "1101" => -- MOV
+						EXMEM_ra <= IDEX_rb;
+					when others => NULL;
+				end case;
+			end if;
 		end if;
 end process;
 
@@ -239,11 +241,11 @@ process (clock)
 				when "1000" => -- NAND
 					NULL;
 				when "1011" => -- IN
-					NULL;
+					MEMWB_ra <= in_port;
 				when "1100" => -- OUT
 					out_port <= EXMEM_ra;
 				when "1101" => -- MOV
-					MEMWB_ra <= in_port;
+					NULL;
 				when others => NULL;
 			end case;	
 		end if;

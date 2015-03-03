@@ -111,10 +111,12 @@ process (alu_mode, in1, in2, rst)
 					int_n <= '0';
 				end if;
 			when "111" => -- shift left logical
-				int_result := SHIFT_LEFT(in1, 1);
+				int_result(7 downto 1) := in1(6 downto 0);
+				int_result(0) := '0';
 				int_z <= in1(7);
 			when "000" => -- shift right logical
-				int_result := SHIFT_RIGHT(in1, 1);
+				int_result(6 downto 0) := in1(7 downto 1);
+				int_result(7) := '0';
 				int_z <= in1(0);
 			when others => NULL;
 		end case;
