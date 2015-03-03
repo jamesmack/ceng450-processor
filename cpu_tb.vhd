@@ -58,7 +58,7 @@ ARCHITECTURE behavior OF cpu_tb IS
    signal out_port : std_logic_vector(7 downto 0);
 
    -- Clock period definitions
-   constant clock_period : time := 10 ns;
+   constant clock_period : time := 25 ns;
  
 BEGIN
  

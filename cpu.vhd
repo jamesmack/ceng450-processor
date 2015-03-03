@@ -114,7 +114,7 @@ REG: register_file port map (rst => reset, clk => clock, rd_index1 => IFID_ra_ad
 ALU_EXE: alu port map ( rst => reset, clk => clock, in1 => SIGNED(IDEX_ra), in2 => SIGNED(IDEX_rb), result => alu_result, z_flag => z_flag, n_flag => n_flag, alu_mode => alu_mode);
 
 -- Control Section
-process (rst)
+process (clock)
 	begin
 		reset <= rst;
 end process;
@@ -130,8 +130,7 @@ process (clock)
 			control_reset <= '1';
 		else
 			if (control_reset ='1') then
-					control_reset <= '0';
-					PC <= std_logic_vector( unsigned(PC) + 1 );
+				control_reset <= '0';
 			else
 				if (clock = '1') then
 					IFID_opcode <= OP(7 downto 4);
@@ -151,32 +150,30 @@ process (clock)
 			IDEX_ra_addr <= "00";
 			IDEX_opcode <= "0000";
 		else
-			if (clock = '1') then
-				IDEX_ra_addr <= IFID_ra_addr;
-				IDEX_opcode <= IFID_opcode;
-			
-				case IFID_opcode(3 downto 0) is
-					when "0000" =>	-- NOP
-						NULL;
-					when "0100" => -- ADD
-						alu_mode <= "100";
-					when "0101" => -- SUB
-						alu_mode <= "101";
-					when "0110" => -- SHL
-						alu_mode <= "111";
-					when "0111" => -- SHR
-						alu_mode <= "000";
-					when "1000" => -- NAND
-						alu_mode <= "110";
-					when "1011" => -- IN
-						NULL;
-					when "1100" => -- OUT
-						NULL;
-					when "1101" => -- MOV
-						NULL;
-					when others => NULL;
-				end case;
-			end if;
+			IDEX_ra_addr <= IFID_ra_addr;
+			IDEX_opcode <= IFID_opcode;
+		
+			case IFID_opcode(3 downto 0) is
+				when "0000" =>	-- NOP
+					NULL;
+				when "0100" => -- ADD
+					alu_mode <= "100";
+				when "0101" => -- SUB
+					alu_mode <= "101";
+				when "0110" => -- SHL
+					alu_mode <= "111";
+				when "0111" => -- SHR
+					alu_mode <= "000";
+				when "1000" => -- NAND
+					alu_mode <= "110";
+				when "1011" => -- IN
+					NULL;
+				when "1100" => -- OUT
+					NULL;
+				when "1101" => -- MOV
+					NULL;
+				when others => NULL;
+			end case;
 		end if;
 end process;
 
@@ -188,33 +185,31 @@ process (clock)
 			EXMEM_ra_addr <= "00";
 			EXMEM_ra <= "00000000";
 		else
-			if (clock = '1') then
-				EXMEM_opcode <= IDEX_opcode;
-				EXMEM_ra_addr <= IDEX_ra_addr;
-				EXMEM_ra <= IDEX_ra;
-			
-				case IFID_opcode(3 downto 0) is
-					when "0000" =>	-- NOP
-						NULL;
-					when "0100" => -- ADD
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "0101" => -- SUB
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "0110" => -- SHL
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "0111" => -- SHR
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "1000" => -- NAND
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "1011" => -- IN
-						NULL;
-					when "1100" => -- OUT
-						NULL;
-					when "1101" => -- MOV
-						EXMEM_ra <= IDEX_rb;
-					when others => NULL;
-				end case;
-			end if;
+			EXMEM_opcode <= IDEX_opcode;
+			EXMEM_ra_addr <= IDEX_ra_addr;
+			EXMEM_ra <= IDEX_ra;
+		
+			case IDEX_opcode(3 downto 0) is
+				when "0000" =>	-- NOP
+					NULL;
+				when "0100" => -- ADD
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "0101" => -- SUB
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "0110" => -- SHL
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "0111" => -- SHR
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "1000" => -- NAND
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "1011" => -- IN
+					NULL;
+				when "1100" => -- OUT
+					NULL;
+				when "1101" => -- MOV
+					EXMEM_ra <= IDEX_rb;
+				when others => NULL;
+			end case;
 		end if;
 end process;
 
@@ -226,33 +221,31 @@ process (clock)
 			MEMWB_ra_addr <= "00";
 			MEMWB_ra <= "00000000";
 		else	
-			if (clock ='1') then
-				MEMWB_opcode <= EXMEM_opcode;
-				MEMWB_ra_addr <= EXMEM_ra_addr;
-				MEMWB_ra <= EXMEM_ra;
-			
-				case EXMEM_opcode(3 downto 0) is
-					when "0000" =>	-- NOP
-						NULL;
-					when "0100" => -- ADD
-						NULL;
-					when "0101" => -- SUB
-						NULL;
-					when "0110" => -- SHL
-						NULL;
-					when "0111" => -- SHR
-						NULL;
-					when "1000" => -- NAND
-						NULL;
-					when "1011" => -- IN
-						MEMWB_ra <= in_port;
-					when "1100" => -- OUT
-						out_port <= EXMEM_ra;
-					when "1101" => -- MOV
-						NULL;
-					when others => NULL;
-				end case;
-			end if;
+			MEMWB_opcode <= EXMEM_opcode;
+			MEMWB_ra_addr <= EXMEM_ra_addr;
+			MEMWB_ra <= EXMEM_ra;
+		
+			case EXMEM_opcode(3 downto 0) is
+				when "0000" =>	-- NOP
+					NULL;
+				when "0100" => -- ADD
+					NULL;
+				when "0101" => -- SUB
+					NULL;
+				when "0110" => -- SHL
+					NULL;
+				when "0111" => -- SHR
+					NULL;
+				when "1000" => -- NAND
+					NULL;
+				when "1011" => -- IN
+					NULL;
+				when "1100" => -- OUT
+					out_port <= EXMEM_ra;
+				when "1101" => -- MOV
+					MEMWB_ra <= in_port;
+				when others => NULL;
+			end case;	
 		end if;
 end process;
 

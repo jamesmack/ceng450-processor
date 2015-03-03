@@ -53,7 +53,7 @@ process(clk)
 				--end loop;
 				reg_file(0) <= "00000010";
 				reg_file(1) <= "00000011";
-				reg_file(2) <= "00000110";
+				reg_file(2) <= "00000111";
 				reg_file(3) <= "00001000";
 			elsif(wr_enable='1')then
 				case wr_index(1 downto 0) is
