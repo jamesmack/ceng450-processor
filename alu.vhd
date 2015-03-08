@@ -31,7 +31,6 @@ use ieee.std_logic_unsigned.all;
 
 entity alu is
     Port ( rst : in  STD_LOGIC;
-           clk : in  STD_LOGIC;
            in1 : in  SIGNED (7 downto 0);
            in2 : in  SIGNED (7 downto 0);
            alu_mode : in  STD_LOGIC_VECTOR (2 downto 0);
@@ -42,26 +41,8 @@ end alu;
 
 architecture Behavioral of alu is
 
--- internal lines
-signal int_z : std_logic := '0';
-signal int_n : std_logic := '0';
 
 begin
-
-process(clk)
-	begin
-		if (clk='0' and clk'event) then
-			if (rst='1') then
-				z_flag <= '0';
-				n_flag <= '0';
-			else
-				z_flag <= int_z;
-				n_flag <= int_n;
-			end if;
-		end if;
-end process;
- 
---Process alu
 process (alu_mode, in1, in2, rst)
 	variable int_result : SIGNED (7 downto 0);
 
@@ -72,61 +53,67 @@ process (alu_mode, in1, in2, rst)
 				int_result := in1 + in2;
 				
 				if (int_result = 0) then
-					int_z <= '1';
+					z_flag <= '1';
 				else 
-					int_z <= '0';
+					z_flag <= '0';
 				end if;
 				
 				if (int_result < 0) then
-					int_n <= '1';
+					n_flag <= '1';
 				else
-					int_n <= '0';
+					n_flag <= '0';
 				end if;
 			when "101" => -- subtract
 				int_result := in1 - in2;
 				
 				if (int_result = 0) then
-					int_z <= '1';
+					z_flag <= '1';
 				else 
-					int_z <= '0';
+					z_flag <= '0';
 				end if;
 				
 				if (int_result < 0) then
-					int_n <= '1';
+					n_flag <= '1';
 				else
-					int_n <= '0';
+					n_flag <= '0';
 				end if;
 			when "110" => -- nand
 				int_result := in1 nand in2;
 				
 				if (int_result = 0) then
-					int_z <= '1';
+					z_flag <= '1';
 				else 
-					int_z <= '0';
+					z_flag <= '0';
 				end if;
 				
 				if (int_result < 0) then
-					int_n <= '1';
+					n_flag <= '1';
 				else
-					int_n <= '0';
+					n_flag <= '0';
 				end if;
 			when "111" => -- shift left logical
 				int_result(7 downto 1) := in1(6 downto 0);
 				int_result(0) := '0';
-				int_z <= in1(7);
+				z_flag <= in1(7);
+				n_flag <= '0';
 			when "000" => -- shift right logical
 				int_result(6 downto 0) := in1(7 downto 1);
 				int_result(7) := '0';
-				int_z <= in1(0);
-			when others => NULL;
+				z_flag <= in1(0);
+				n_flag <= '0';
+			when others => -- Default output
+				int_result := "00000000";
+				z_flag <= '0';
+				n_flag <= '0';
 		end case;
 		
-		if (rst='1') then
-			int_z <= '0';
-			int_n <= '0';
-		end if;	
-		
 		result <= int_result;
+		
+		if (rst='1') then
+			z_flag <= '0';
+			n_flag <= '0';
+			result <= "00000000";
+		end if;	
 end process;
 	
 end Behavioral;

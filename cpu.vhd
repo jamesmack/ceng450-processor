@@ -40,7 +40,6 @@ architecture Behavioral of cpu is
 
 component alu
 	Port ( rst : in  STD_LOGIC;
-				  clk : in  STD_LOGIC;
 				  in1 : in  SIGNED (7 downto 0);
 				  in2 : in  SIGNED (7 downto 0);
 				  alu_mode : in  STD_LOGIC_VECTOR (2 downto 0);
@@ -74,13 +73,20 @@ end component;
 -- Control lines
 signal reset: std_logic := '1';
 signal control_reset: std_logic := '1';
-signal PC: std_logic_vector(7 downto 0) := "00000000";
+signal PC: std_logic_vector(6 downto 0) := "0000000";
 
 signal reg_write: std_logic;
+signal reg_write_pulse: std_logic;
 signal reg_data: std_logic_vector(7 downto 0);
 signal reg_addr: std_logic_vector(1 downto 0);
+signal reg_out1: std_logic_vector(7 downto 0);
+signal reg_out2: std_logic_vector(7 downto 0);
+signal reg_in1: std_logic_vector(1 downto 0);
+signal reg_in2: std_logic_vector(1 downto 0);
 
 signal alu_mode: std_logic_vector(2 downto 0);
+signal alu_in1: SIGNED(7 downto 0);
+signal alu_in2: SIGNED(7 downto 0);
 signal alu_result: SIGNED(7 downto 0);
 signal z_flag: std_logic;
 signal n_flag: std_logic;
@@ -109,36 +115,34 @@ signal OP: std_logic_vector(7 downto 0); -- used in fetch
 begin
 
 
-ROM: ROM_VHDL port map (clk => clock, addr => PC( 6 downto 0), data => OP);
-REG: register_file port map (rst => reset, clk => clock, rd_index1 => IFID_ra_addr, rd_index2 => IFID_rb_addr, rd_data1 => IDEX_ra, rd_data2 => IDEX_rb, wr_index => reg_addr, wr_data => reg_data, wr_enable => reg_write);
-ALU_EXE: alu port map ( rst => reset, clk => clock, in1 => SIGNED(IDEX_ra), in2 => SIGNED(IDEX_rb), result => alu_result, z_flag => z_flag, n_flag => n_flag, alu_mode => alu_mode);
+ROM: ROM_VHDL port map (clk => clock, addr => PC, data => OP);
+REG: register_file port map (rst => reset, clk => clock, rd_index1 => reg_in1, rd_index2 => reg_in2, rd_data1 => reg_out1, rd_data2 => reg_out2, wr_index => reg_addr, wr_data => reg_data, wr_enable => reg_write);
+ALU_EXE: alu port map ( rst => reset, in1 => alu_in1, in2 => alu_in2, result => alu_result, z_flag => z_flag, n_flag => n_flag, alu_mode => alu_mode);
 
 -- Control Section
-process (clock)
+process (rst)
 	begin
 		reset <= rst;
 end process;
 
 -- Fetch Section--
-process (clock)
+process (clock, reset)
 	begin
 		if (reset = '1') then 
 			IFID_opcode <= "0000";
 			IFID_ra_addr <= "00";
 			IFID_rb_addr <= "00";
-			PC <= "00000000";
+			PC <= "0000000";
 			control_reset <= '1';
-		else
+		elsif (rising_edge(clock)) then
 			if (control_reset ='1') then
 				control_reset <= '0';
-			else
-				if (clock = '1') then
-					IFID_opcode <= OP(7 downto 4);
-					IFID_ra_addr <= OP(3 downto 2);
-					IFID_rb_addr <= OP(1 downto 0);
-				
-					PC <= std_logic_vector( unsigned(PC) + 1 );
-				end if;
+			else 
+				IFID_opcode <= OP(7 downto 4);
+				IFID_ra_addr <= OP(3 downto 2);
+				IFID_rb_addr <= OP(1 downto 0);
+			
+				PC <= std_logic_vector( unsigned(PC) + 1 );
 			end if;
 		end if;
 end process;
@@ -146,12 +150,23 @@ end process;
 -- Decode Section
 process (clock)
 	begin
+		if (falling_edge(clock)) then
+			reg_in1 <= IFID_ra_addr;
+			reg_in2 <= IFID_rb_addr;
+		end if;
+end process;
+
+process (clock, control_reset)
+	begin
 		if (control_reset = '1') then 
 			IDEX_ra_addr <= "00";
 			IDEX_opcode <= "0000";
-		else
+		elsif (rising_edge(clock)) then
 			IDEX_ra_addr <= IFID_ra_addr;
 			IDEX_opcode <= IFID_opcode;
+		
+			IDEX_ra <= reg_out1;
+			IDEX_rb <= reg_out2;
 		
 			case IFID_opcode(3 downto 0) is
 				when "0000" =>	-- NOP
@@ -180,49 +195,77 @@ end process;
 -- Execute Section
 process (clock)
 	begin
+		if (falling_edge(clock)) then
+			case IDEX_opcode(3 downto 0) is
+				when "0000" =>	-- NOP
+					NULL;
+				when "0100" => -- ADD
+					alu_in1 <= SIGNED(IDEX_ra);
+					alu_in2 <= SIGNED(IDEX_rb);
+				when "0101" => -- SUB
+					alu_in1 <= SIGNED(IDEX_ra);
+					alu_in2 <= SIGNED(IDEX_rb);
+				when "0110" => -- SHL
+					alu_in1 <= SIGNED(IDEX_ra);
+				when "0111" => -- SHR
+					alu_in1 <= SIGNED(IDEX_ra);
+				when "1000" => -- NAND
+					alu_in1 <= SIGNED(IDEX_ra);
+					alu_in2 <= SIGNED(IDEX_rb);
+				when "1011" => -- IN
+					NULL;
+				when "1100" => -- OUT
+					NULL;
+				when "1101" => -- MOV
+					NULL;
+				when others => NULL;
+			end case;
+		end if;
+end process;
+
+process (clock, control_reset)
+	begin
 		if (control_reset = '1') then 
 			EXMEM_opcode <= "0000";
 			EXMEM_ra_addr <= "00";
 			EXMEM_ra <= "00000000";
-		else
-			if (rising_edge(clock)) then
-				EXMEM_opcode <= IDEX_opcode;
-				EXMEM_ra_addr <= IDEX_ra_addr;
-				EXMEM_ra <= IDEX_ra;
-			
-				case IDEX_opcode(3 downto 0) is
-					when "0000" =>	-- NOP
-						NULL;
-					when "0100" => -- ADD
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "0101" => -- SUB
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "0110" => -- SHL
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "0111" => -- SHR
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "1000" => -- NAND
-						EXMEM_ra <= std_logic_vector(alu_result);
-					when "1011" => -- IN
-						NULL;
-					when "1100" => -- OUT
-						NULL;
-					when "1101" => -- MOV
-						EXMEM_ra <= IDEX_rb;
-					when others => NULL;
-				end case;
-			end if;
+		elsif (rising_edge(clock)) then
+			EXMEM_opcode <= IDEX_opcode;
+			EXMEM_ra_addr <= IDEX_ra_addr;
+			EXMEM_ra <= IDEX_ra;
+		
+			case IDEX_opcode(3 downto 0) is
+				when "0000" =>	-- NOP
+					NULL;
+				when "0100" => -- ADD
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "0101" => -- SUB
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "0110" => -- SHL
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "0111" => -- SHR
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "1000" => -- NAND
+					EXMEM_ra <= std_logic_vector(alu_result);
+				when "1011" => -- IN
+					NULL;
+				when "1100" => -- OUT
+					NULL;
+				when "1101" => -- MOV
+					EXMEM_ra <= IDEX_rb;
+				when others => NULL;
+			end case;
 		end if;
 end process;
 
 -- Memory Section
-process (clock)
+process (clock, control_reset)
 	begin
 		if (control_reset = '1') then 
 			MEMWB_opcode <= "0000";
 			MEMWB_ra_addr <= "00";
 			MEMWB_ra <= "00000000";
-		else	
+		elsif (rising_edge(clock)) then	
 			MEMWB_opcode <= EXMEM_opcode;
 			MEMWB_ra_addr <= EXMEM_ra_addr;
 			MEMWB_ra <= EXMEM_ra;
@@ -252,54 +295,56 @@ process (clock)
 end process;
 
 -- Write Back Section
-process (clock)
+process (clock, control_reset)
 	begin
 		if (control_reset = '1') then
-			reg_write <= '0';
+			reg_write_pulse <= '0';
 			reg_data <= "00000000";
 			reg_addr <= "00";
-		else
-			if (clock='0') then
-				reg_write <= '0';
-			else
-				case MEMWB_opcode(3 downto 0) is
-					when "0000" =>	-- NOP
-						NULL;
-					when "0100" => -- ADD
-						reg_data <= MEMWB_ra;
-						reg_addr <= MEMWB_ra_addr;
-						reg_write <= '1';
-					when "0101" => -- SUB
-						reg_data <= MEMWB_ra;
-						reg_addr <= MEMWB_ra_addr;
-						reg_write <= '1';
-					when "0110" => -- SHL
-						reg_data <= MEMWB_ra;
-						reg_addr <= MEMWB_ra_addr;
-						reg_write <= '1';
-					when "0111" => -- SHR
-						reg_data <= MEMWB_ra;
-						reg_addr <= MEMWB_ra_addr;
-						reg_write <= '1';
-					when "1000" => -- NAND
-						reg_data <= MEMWB_ra;
-						reg_addr <= MEMWB_ra_addr;
-						reg_write <= '1';
-					when "1011" => -- IN
-						reg_data <= MEMWB_ra;
-						reg_addr <= MEMWB_ra_addr;
-						reg_write <= '1';
-					when "1100" => -- OUT
-						NULL;
-					when "1101" => -- MOV
-						reg_data <= MEMWB_ra;
-						reg_addr <= MEMWB_ra_addr;
-						reg_write <= '1';
-					when others => NULL;
-				end case;	
+		elsif (rising_edge(clock)) then	
+			if (reg_write_pulse = '1') then
+				reg_write_pulse <= '0';
 			end if;
+			
+			case MEMWB_opcode(3 downto 0) is
+				when "0000" =>	-- NOP
+					NULL;
+				when "0100" => -- ADD
+					reg_data <= MEMWB_ra;
+					reg_addr <= MEMWB_ra_addr;
+					reg_write_pulse <= '1';
+				when "0101" => -- SUB
+					reg_data <= MEMWB_ra;
+					reg_addr <= MEMWB_ra_addr;
+					reg_write_pulse <= '1';
+				when "0110" => -- SHL
+					reg_data <= MEMWB_ra;
+					reg_addr <= MEMWB_ra_addr;
+					reg_write_pulse <= '1';
+				when "0111" => -- SHR
+					reg_data <= MEMWB_ra;
+					reg_addr <= MEMWB_ra_addr;
+					reg_write_pulse <= '1';
+				when "1000" => -- NAND
+					reg_data <= MEMWB_ra;
+					reg_addr <= MEMWB_ra_addr;
+					reg_write_pulse <= '1';
+				when "1011" => -- IN
+					reg_data <= MEMWB_ra;
+					reg_addr <= MEMWB_ra_addr;
+					reg_write_pulse <= '1';
+				when "1100" => -- OUT
+					NULL;
+				when "1101" => -- MOV
+					reg_data <= MEMWB_ra;
+					reg_addr <= MEMWB_ra_addr;
+					reg_write_pulse <= '1';
+				when others => NULL;
+			end case;
 		end if;
 end process;
+
+reg_write <= reg_write_pulse and clock;
 
 end Behavioral;
 
