@@ -51,8 +51,8 @@ process(clk)
 				--for i in 0 to 3 loop
 					--reg_file(i)<= (others => '0');
 				--end loop;
-				reg_file(0) <= "00000010";
-				reg_file(1) <= "00000011";
+				reg_file(0) <= "11111111";
+				reg_file(1) <= "11111111";
 				reg_file(2) <= "00000111";
 				reg_file(3) <= "00001000";
 			elsif(wr_enable='1')then

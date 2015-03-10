@@ -16,70 +16,148 @@ architecture BHV of ROM_VHDL is
     type ROM_TYPE is array (0 to 127) of std_logic_vector (7 downto 0);
 
     constant rom_content : ROM_TYPE := (
+-- in this program, the loop will be executed 8 times, each time r0 is right shifted and r1 is left shifted
+-- first 4 loops, output (add r0, r1), last 4 loops, output (nand r0,r1)
+-- 1st loop: out 7F+FE
+-- 2nd loop: out 3F+FC
+-- 3rd loop: out 1F+F8
+-- 4th loop: out 0F+F0
+-- 5th loop: out 07 nand E0
+-- 6th loop: out 03 nand C0
+-- 7th loop: out 01 nand 80
+-- 8th loop: out 00 nand 00
+
+
+
 00 =>   x"00", -- NOP
 01 =>   x"00", -- NOP
-02 =>	x"30", -- #start# LOADIMM r0, 0XFF
-03 =>	x"FF", -- 0xFF, the immediate value
-04 =>	x"34", -- LOADIMM r1, 0X0c
-05 =>	x"0c", -- 0x0C, the immediate value
+02 =>	x"30", -- loadimm	r0,0F		#start#  
+03 =>	x"0F", -- 
+04 =>	x"00", -- NOP
+05 =>	x"00", -- NOP
 06 =>	x"00", -- NOP
 07 =>	x"00", -- NOP
 08 =>	x"00", -- NOP
-09 =>	x"00", -- NOP
-10 =>	x"64", -- SHL r1
-11 =>	x"00", -- NOP
-12 =>	x"00", -- NOP
+09 =>	x"20", -- store	 r0,add_nand
+10 =>	x"0F", -- 
+11 =>	x"30", -- loadimm	r0,7
+12 =>	x"07", -- 
 13 =>	x"00", -- NOP
 14 =>	x"00", -- NOP
-15 =>	x"51", -- SUB r0, r1
-16 =>	x"38", -- LOADIMM r2, 0x03
-17 =>	x"03", -- 0x03, the immediate value
-18 =>	x"00", -- NOP
-19 =>	x"00", -- NOP
-20 =>	x"00", -- NOP
-21 =>	x"00", -- NOP
-22 =>	x"D6", -- MOV r1, r2
-23 =>	x"00", -- NOP
+15 =>	x"00", -- NOP
+16 =>	x"00", -- NOP
+17 =>	x"00", -- NOP
+18 =>	x"20", -- store		r0,counter
+19 =>	x"0E", -- 
+20 =>	x"30", -- loadimm 	r0,FF
+21 =>	x"FF", -- 
+22 =>	x"34", -- loadimm		r1,FF
+23 =>	x"FF", -- 
 24 =>	x"00", -- NOP
 25 =>	x"00", -- NOP
 26 =>	x"00", -- NOP
-27 =>	x"B8", -- IN r2			-- Set the Input port switches on "0xC0" ("11000000")
+27 =>	x"00", -- NOP
 28 =>	x"00", -- NOP
-29 =>	x"00", -- NOP
-30 =>	x"00", -- NOP
+29 =>	x"70", -- shr		r0  		#loop# 
+30 =>	x"64", -- shl		r1
 31 =>	x"00", -- NOP
-32 =>	x"28", -- STORE r2, 0x70
-33 =>	x"70", -- Effective Address
-34 =>	x"49", -- ADD r2, r1
-35 =>	x"00", -- NOP
-36 =>	x"00", -- NOP
-37 =>	x"00", -- NOP
+32 =>	x"00", -- NOP
+33 =>	x"00", -- NOP
+34 =>	x"00", -- NOP
+35 =>	x"DC", -- mov		r3,r0 	
+36 =>	x"10", -- load		r0,add_nand
+37 =>	x"0F", -- 
 38 =>	x"00", -- NOP
-39 =>	x"88", -- NAND r2, r0
+39 =>	x"00", -- NOP
 40 =>	x"00", -- NOP
 41 =>	x"00", -- NOP
 42 =>	x"00", -- NOP
-43 =>	x"00", -- NOP
-44 =>	x"C8", -- OUT r2			--At this point R[2] must be "00111100"
-45 =>	x"10", -- LOAD r0, 0x70
-46 =>	x"70", -- Effective Address
+43 =>	x"70", -- shr		r0
+44 =>	x"00", -- NOP
+45 =>	x"00", -- NOP
+46 =>	x"00", -- NOP
 47 =>	x"00", -- NOP
 48 =>	x"00", -- NOP
-49 =>	x"00", -- NOP
-50 =>	x"00", -- NOP
-51 =>	x"70", -- SHR r0
+49 =>	x"20", -- store		r0,add_nand
+50 =>	x"0F", -- 
+51 =>	x"D3", -- mov		r0,r3	
 52 =>	x"00", -- NOP
 53 =>	x"00", -- NOP
 54 =>	x"00", -- NOP
 55 =>	x"00", -- NOP
-56 =>	x"48", -- ADD r2, r0		--At this point negative flag must be set
+56 =>	x"00", -- NOP
 57 =>	x"00", -- NOP
-58 =>	x"00", -- NOP
-59 =>	x"00", -- NOP
+58 =>	x"38", -- loadimm		r2,nand
+59 =>	x"00", -- 
 60 =>	x"00", -- NOP
-61 =>	x"C8", -- OUT r2		--At this point R[2] have to be "10011100"
+61 =>	x"00", -- NOP
+62 =>	x"00", -- NOP
+63 =>	x"00", -- NOP
+64 =>	x"00", -- NOP
+65 =>	x"96", -- brz		nand:
+66 =>	x"41", -- add		r0,r1   
+67 =>	x"38", -- loadimm	r2,out_add_nand
+68 =>	x"4C", -- 
+69 =>	x"00", -- NOP
+70 =>	x"00", -- NOP
+71 =>	x"00", -- NOP
+72 =>	x"00", -- NOP
+73 =>	x"00", -- NOP
+74 =>	x"92", -- br		out_add_nand
+75 =>	x"81", -- nand		r0,r1              #nand#
+76 =>	x"00", -- NOP    			   #out_add_nand# 
+77 =>	x"00", -- NOP
+78 =>	x"00", -- NOP
+79 =>	x"00", -- NOP
+80 =>	x"00", -- NOP
+81 =>	x"C0", -- out		r0
+82 =>	x"10", -- load		r0,counter
+83 =>	x"0E", -- 
+84 =>	x"D9", -- mov		r2,r1		
+85 =>	x"34", -- loadimm	r1,1
+86 =>	x"01", -- 
+87 =>	x"00", -- NOP
+88 =>	x"00", -- NOP
+89 =>	x"00", -- NOP
+90 =>	x"00", -- NOP
+91 =>	x"00", -- NOP
+92 =>	x"51", -- sub		r0,r1
+93 =>	x"00", -- NOP
+94 =>	x"00", -- NOP
+95 =>	x"00", -- NOP
+96 =>	x"00", -- NOP
+97 =>	x"00", -- NOP
+98 =>	x"20", -- store		r0,counter
+99 =>	x"0E", -- 
+100 =>	x"D6", -- mov		r1,r2	
+101 =>	x"38", -- loadimm		r2,out:
+102 =>	x"76", -- 
+103 =>	x"00", -- NOP
+104 =>	x"00", -- NOP
+105 =>	x"00", -- NOP
+106 =>	x"D3", -- mov		r0,r3	
+107 =>	x"00", -- NOP
+108 =>	x"00", -- NOP
+109 =>	x"9A", -- brn		out
+110 =>	x"38", -- loadimm		r2,loop
+111 =>	x"1D", -- 
+112 =>	x"00", -- NOP
+113 =>	x"00", -- NOP
+114 =>	x"00", -- NOP
+115 =>	x"00", -- NOP
+116 =>	x"00", -- NOP
+117 =>	x"92", -- br		loop
+118 =>	x"38", -- loadimm		r2,start     #out#
+119 =>	x"02", -- 
+120 =>	x"00", -- NOP
+121 =>	x"00", -- NOP
+122 =>	x"00", -- NOP
+123 =>	x"00", -- NOP
+124 =>	x"00", -- NOP
+125 =>	x"92", -- br		start
+126 =>	x"00", -- NOP
+127 =>	x"00", -- NOP);
 
---All other memory locations contain NOP
 others =>	x"00");
 
 begin
@@ -87,7 +165,7 @@ begin
 p1:    process (clk)
 	 variable add_in : integer := 0;
     begin
-        if rising_edge(clk) then
+        if falling_edge(clk) then
 					 add_in := conv_integer(unsigned(addr));
                 data <= rom_content(add_in);
         end if;
