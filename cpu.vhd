@@ -286,8 +286,13 @@ process (clock)
 					when "1101" => -- MOV
 						NULL;
 					when "1110" => -- Return
-						PC_data <= LR;
-						PC_write <= '1';
+						case IDEX_ra_addr is
+							when "00" =>
+								PC_data <= LR;
+								PC_write <= '1';
+							when others =>
+								NULL;
+							end case;
 					when others => NULL;
 				end case;
 			end if;

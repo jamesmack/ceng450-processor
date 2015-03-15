@@ -103,7 +103,7 @@ architecture BHV of ROM_VHDL is
 71 =>	x"00", -- NOP
 72 =>	x"00", -- NOP
 73 =>	x"00", -- NOP
-74 =>	x"92", -- br		out_add_nand
+74 =>	x"e0", -- br.sub		out_add_nand
 75 =>	x"81", -- nand		r0,r1              #nand#
 76 =>	x"00", -- NOP    			   #out_add_nand# 
 77 =>	x"00", -- NOP

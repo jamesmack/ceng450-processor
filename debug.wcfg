@@ -51,13 +51,13 @@
       <obj_property name="ElementShortName">pc_data[6:0]</obj_property>
       <obj_property name="ObjectShortName">pc_data[6:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/lr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">lr[6:0]</obj_property>
+      <obj_property name="ObjectShortName">lr[6:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/cpu_tb/uut/pc_write" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">pc_write</obj_property>
       <obj_property name="ObjectShortName">pc_write</obj_property>
-   </wvobject>
-   <wvobject fp_name="/cpu_tb/uut/pc_write_pulse" type="logic" db_ref_id="1">
-      <obj_property name="ElementShortName">pc_write_pulse</obj_property>
-      <obj_property name="ObjectShortName">pc_write_pulse</obj_property>
    </wvobject>
    <wvobject fp_name="/cpu_tb/uut/rom_op" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">rom_op[7:0]</obj_property>
