@@ -1,0 +1,30 @@
+
+
+NET "clock" LOC = U9;
+NET "in_port[0]" LOC = G18;
+NET "in_port[1]" LOC = H18;
+NET "in_port[2]" LOC = K18;
+NET "in_port[3]" LOC = K17;
+NET "in_port[4]" LOC = L14;
+NET "in_port[5]" LOC = L13;
+NET "in_port[6]" LOC = N17;
+NET "in_port[7]" LOC = R17;
+NET "out_port[0]" LOC = J14;
+NET "out_port[1]" LOC = J15;
+NET "out_port[2]" LOC = K15;
+NET "out_port[3]" LOC = K14;
+NET "out_port[4]" LOC = E16;
+NET "out_port[5]" LOC = P16;
+NET "out_port[6]" LOC = E4;
+NET "out_port[7]" LOC = P4;
+NET "rst" LOC = B18;
+
+
+NET "in_port[0]" IOSTANDARD = LVCMOS25;
+NET "in_port[1]" IOSTANDARD = LVCMOS25;
+NET "in_port[2]" IOSTANDARD = LVCMOS25;
+NET "in_port[3]" IOSTANDARD = LVCMOS25;
+NET "in_port[4]" IOSTANDARD = LVCMOS25;
+NET "in_port[5]" IOSTANDARD = LVCMOS25;
+NET "in_port[6]" IOSTANDARD = LVCMOS25;
+NET "in_port[7]" IOSTANDARD = LVCMOS25;

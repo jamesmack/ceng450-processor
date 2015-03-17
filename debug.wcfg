@@ -13,7 +13,7 @@
          </top_modules>
       </db_ref>
    </db_ref_list>
-   <WVObjectSize size="41" />
+   <WVObjectSize size="54" />
    <wvobject fp_name="/cpu_tb/in_port" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">in_port[7:0]</obj_property>
       <obj_property name="ObjectShortName">in_port[7:0]</obj_property>
@@ -25,6 +25,27 @@
    <wvobject fp_name="/cpu_tb/uut/REG/reg_file" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">reg_file[0:3]</obj_property>
       <obj_property name="ObjectShortName">reg_file[0:3]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+      <wvobject fp_name="/cpu_tb/uut/REG/reg_file[0]" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">reg_file[0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/cpu_tb/uut/REG/reg_file[1]" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">reg_file[1]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/cpu_tb/uut/REG/reg_file[2]" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">reg_file[2]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/cpu_tb/uut/REG/reg_file[3]" type="array" db_ref_id="1">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">reg_file[3]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="/cpu_tb/clock" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">clock</obj_property>
@@ -47,6 +68,14 @@
       <obj_property name="ObjectShortName">pc[6:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/pc_skip" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">pc_skip</obj_property>
+      <obj_property name="ObjectShortName">pc_skip</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/pc_skip_pulse" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">pc_skip_pulse</obj_property>
+      <obj_property name="ObjectShortName">pc_skip_pulse</obj_property>
+   </wvobject>
    <wvobject fp_name="/cpu_tb/uut/pc_data" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">pc_data[6:0]</obj_property>
       <obj_property name="ObjectShortName">pc_data[6:0]</obj_property>
@@ -58,10 +87,6 @@
    <wvobject fp_name="/cpu_tb/uut/pc_write" type="logic" db_ref_id="1">
       <obj_property name="ElementShortName">pc_write</obj_property>
       <obj_property name="ObjectShortName">pc_write</obj_property>
-   </wvobject>
-   <wvobject fp_name="/cpu_tb/uut/rom_op" type="array" db_ref_id="1">
-      <obj_property name="ElementShortName">rom_op[7:0]</obj_property>
-      <obj_property name="ObjectShortName">rom_op[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="divider38" type="divider">
       <obj_property name="label">Writeback</obj_property>
@@ -111,15 +136,62 @@
       <obj_property name="ElementShortName">n_flag</obj_property>
       <obj_property name="ObjectShortName">n_flag</obj_property>
    </wvobject>
+   <wvobject fp_name="divider51" type="divider">
+      <obj_property name="label">RAM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">128 128 255</obj_property>
+      <obj_property name="TextColor">230 230 230</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/RAM/ram_content" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ram_content[0:127]</obj_property>
+      <obj_property name="ObjectShortName">ram_content[0:127]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/ram_addr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ram_addr[6:0]</obj_property>
+      <obj_property name="ObjectShortName">ram_addr[6:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/ram_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ram_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">ram_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/ram_wr_data" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ram_wr_data[7:0]</obj_property>
+      <obj_property name="ObjectShortName">ram_wr_data[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/ram_wr_addr" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ram_wr_addr[6:0]</obj_property>
+      <obj_property name="ObjectShortName">ram_wr_addr[6:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/ram_wr_en" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">ram_wr_en</obj_property>
+      <obj_property name="ObjectShortName">ram_wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/ram_wr_en_pulse" type="logic" db_ref_id="1">
+      <obj_property name="ElementShortName">ram_wr_en_pulse</obj_property>
+      <obj_property name="ObjectShortName">ram_wr_en_pulse</obj_property>
+   </wvobject>
    <wvobject fp_name="divider32" type="divider">
       <obj_property name="label">Opcode</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">128 128 255</obj_property>
       <obj_property name="TextColor">230 230 230</obj_property>
    </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/rom_op_1" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">rom_op_1[7:0]</obj_property>
+      <obj_property name="ObjectShortName">rom_op_1[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/rom_op_2" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">rom_op_2[7:0]</obj_property>
+      <obj_property name="ObjectShortName">rom_op_2[7:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/cpu_tb/uut/ifid_opcode" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">ifid_opcode[3:0]</obj_property>
       <obj_property name="ObjectShortName">ifid_opcode[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/ifid_mem" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">ifid_mem[7:0]</obj_property>
+      <obj_property name="ObjectShortName">ifid_mem[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/cpu_tb/uut/idex_opcode" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">idex_opcode[3:0]</obj_property>
@@ -192,5 +264,9 @@
    <wvobject fp_name="/cpu_tb/uut/idex_rb" type="array" db_ref_id="1">
       <obj_property name="ElementShortName">idex_rb[7:0]</obj_property>
       <obj_property name="ObjectShortName">idex_rb[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/cpu_tb/uut/exmem_rb" type="array" db_ref_id="1">
+      <obj_property name="ElementShortName">exmem_rb[7:0]</obj_property>
+      <obj_property name="ObjectShortName">exmem_rb[7:0]</obj_property>
    </wvobject>
 </wave_config>

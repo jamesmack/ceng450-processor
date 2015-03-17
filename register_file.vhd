@@ -51,10 +51,10 @@ process(clk)
 				--for i in 0 to 3 loop
 					--reg_file(i)<= (others => '0');
 				--end loop;
-				reg_file(0) <= "11111111";
-				reg_file(1) <= "11111111";
-				reg_file(2) <= "00000111";
-				reg_file(3) <= "00001000";
+				reg_file(0) <= "00000000";
+				reg_file(1) <= "00000000";
+				reg_file(2) <= "00000000";
+				reg_file(3) <= "00000000";
 			elsif(wr_enable='1')then
 				case wr_index(1 downto 0) is
 					when "00" => reg_file(0) <= wr_data;

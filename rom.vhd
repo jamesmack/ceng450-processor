@@ -1,13 +1,15 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.STD_LOGIC_ARITH.all;
-
+use ieee.std_logic_unsigned.all;
 
 entity ROM_VHDL is
     port(
          clk      : in  std_logic;
          addr     : in  std_logic_vector (6 downto 0);
-         data     : out std_logic_vector (7 downto 0)
+         data_1     : out std_logic_vector (7 downto 0);
+         data_2     : out std_logic_vector (7 downto 0);
+			data_3     : out std_logic_vector (7 downto 0)
          );
 end ROM_VHDL;
 
@@ -88,7 +90,7 @@ architecture BHV of ROM_VHDL is
 56 =>	x"00", -- NOP
 57 =>	x"00", -- NOP
 58 =>	x"38", -- loadimm		r2,nand
-59 =>	x"00", -- 
+59 =>	x"4B", -- 
 60 =>	x"00", -- NOP
 61 =>	x"00", -- NOP
 62 =>	x"00", -- NOP
@@ -103,7 +105,7 @@ architecture BHV of ROM_VHDL is
 71 =>	x"00", -- NOP
 72 =>	x"00", -- NOP
 73 =>	x"00", -- NOP
-74 =>	x"e0", -- br.sub		out_add_nand
+74 =>	x"92", -- br		out_add_nand
 75 =>	x"81", -- nand		r0,r1              #nand#
 76 =>	x"00", -- NOP    			   #out_add_nand# 
 77 =>	x"00", -- NOP
@@ -156,18 +158,26 @@ architecture BHV of ROM_VHDL is
 124 =>	x"00", -- NOP
 125 =>	x"92", -- br		start
 126 =>	x"00", -- NOP
-127 =>	x"00", -- NOP);
+127 =>	x"00", -- NOP
 
 others =>	x"00");
 
 begin
 
 p1:    process (clk)
-	 variable add_in : integer := 0;
+	 variable add_in_1 : integer := 0;
+	 variable add_in_2 : integer := 0;
+	 variable add_in_3 : integer := 0;
     begin
         if falling_edge(clk) then
-					 add_in := conv_integer(unsigned(addr));
-                data <= rom_content(add_in);
+					 add_in_1 := conv_integer(unsigned(addr));
+                data_1 <= rom_content(add_in_1);
+					 
+					 add_in_2 := conv_integer(unsigned(addr + 1));
+                data_2 <= rom_content(add_in_2);
+					 
+					 add_in_3 := conv_integer(unsigned(addr + 2));
+                data_3 <= rom_content(add_in_3);
         end if;
     end process;
 end BHV;
